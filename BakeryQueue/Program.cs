@@ -1,7 +1,7 @@
 ﻿
 public class Program
 {
-    static Queue<string> _queue = new();
+    static Queue<int> _queue = new();
     static List<Person> _personList = new();
     static int _index=0;
     static int _savedCount = 0;
@@ -29,9 +29,10 @@ public class Program
     }
     static void AddPersonToQueue(string name, int orderNumber)
     {
-        _queue.Enqueue(name);
+        var number = _index++;
+        _queue.Enqueue(number);
 
-        _personList.Add(new(_index++,name, orderNumber, 0));
+        _personList.Add(new(number,name, orderNumber, 0));
 
         Deliver();
     }
@@ -50,14 +51,14 @@ public class Program
     {
         if (_queue.Any())
         {
-            var name = _queue.Dequeue();
+            var number = _queue.Dequeue();
 
-            var item = _personList.Single(x => x.name == name);
+            var item = _personList.Single(x => x.index == number);
 
             item = item with { ownedCount = item.ownedCount + 1 };
 
             if (item.ownedCount < item.orderCount)
-                _queue.Enqueue(name);
+                _queue.Enqueue(number);
 
             Console.WriteLine(string.Join("\n", _personList.Select(w => $"{w.name}: total={w.orderCount} ,owned={w.ownedCount} ").ToArray()));
         }
@@ -72,7 +73,7 @@ public class Program
 
         _personList.Remove(firstPerson);
 
-        _queue = _queue.RemoveItem(firstPerson.name);
+        _queue = _queue.RemoveItem(firstPerson.index);
 
         _savedCount -= firstPerson.orderCount;
 
